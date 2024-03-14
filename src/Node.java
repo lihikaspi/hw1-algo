@@ -1,4 +1,4 @@
-public abstract class Node<T> {
+public class Node<T extends RunnerID> {
     static final int POSITIVE_INFINITY = 1;
     static final int NEGATIVE_INFINITY = -1;
     private Node<T> left;
@@ -26,6 +26,10 @@ public abstract class Node<T> {
 
     public void setKey(T r) {
         key = r;
+    }
+
+    public boolean equals(RunnerID k) {
+        return !key.isSmaller(k) && !k.isSmaller(key);
     }
 
     /**
