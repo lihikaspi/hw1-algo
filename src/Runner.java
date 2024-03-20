@@ -11,14 +11,14 @@ public class Runner {
         this.min = Float.MAX_VALUE;
         this.avg = Float.MAX_VALUE;
         this.countRuns = 0;
-        this.runTree = new TwoThreeTree<Run>();
+        this.runTree = new TwoThreeTreeRun<Run>();
         this.id = id;
     }
 
     public void addRun(float time){
         //Insert Run to the tree
         Run newRun = new Run(time);
-        Node<Run> newLeaf = new Node<Run>(true);
+        Node<Run> newLeaf = new NodeRun<>(true);
         newLeaf.setKey(newRun);
         this.runTree.insert(newLeaf);
 

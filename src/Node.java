@@ -1,4 +1,4 @@
-public class Node<T extends RunnerID> {
+public abstract class Node<T extends RunnerID> {
     static final int POSITIVE_INFINITY = 1;
     static final int NEGATIVE_INFINITY = -1;
     private Node<T> left;
@@ -7,7 +7,7 @@ public class Node<T extends RunnerID> {
     private Node<T> p;
     protected T key;
     private int isSentinel = 0;
-    private boolean isLeaf;
+    private final boolean isLeaf;
 
     public Node(boolean leaf) {
         isLeaf = leaf;
@@ -25,6 +25,8 @@ public class Node<T extends RunnerID> {
     }
 
     public void setKey(T r) {
+        if (r == null)
+            throw new java.lang.UnsupportedOperationException("you are stupid");
         key = r;
     }
 
@@ -47,35 +49,35 @@ public class Node<T extends RunnerID> {
         return key;
     }
 
-    public void setP(Node p) {
+    public void setP(Node<T> p) {
         this.p = p;
     }
 
-    public Node getP() {
+    public Node<T> getP() {
         return p;
     }
 
-    public void setLeft(Node left) {
+    public void setLeft(Node<T> left) {
         this.left = left;
     }
 
-    public Node getLeft() {
+    public Node<T> getLeft() {
         return left;
     }
 
-    public void setMiddle(Node middle) {
+    public void setMiddle(Node<T> middle) {
         this.middle = middle;
     }
 
-    public Node getMiddle() {
+    public Node<T> getMiddle() {
         return middle;
     }
 
-    public void setRight(Node right) {
+    public void setRight(Node<T> right) {
         this.right = right;
     }
 
-    public Node getRight() {
+    public Node<T> getRight() {
         return right;
     }
 
@@ -87,7 +89,4 @@ public class Node<T extends RunnerID> {
         return isSentinel;
     }
 
-    public void setIsSentinel(int isSentinel) {
-        this.isSentinel = isSentinel;
-    }
 }

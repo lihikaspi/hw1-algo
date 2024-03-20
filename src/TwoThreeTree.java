@@ -1,21 +1,22 @@
-public class TwoThreeTree<T extends RunnerID> {
-    private Node root;
+public abstract class TwoThreeTree<T extends RunnerID> {
+    private Node<T> root;
+
 
     /**
-     * constructor implements 2_3_Init
+     * initializes the minimum tree with sentinels
+     * @param x root
+     * @param l left leaf - infinite
+     * @param m right leaf - negative infinite
      */
-    public TwoThreeTree(){
-        Node<T> x = new NodeRunnerID<>(false);
-        Node<T> l = new NodeRunnerID<>(true);
-        Node<T> m = new NodeRunnerID<>(true);
-        l.setKeyInfinity(false);
-        m.setKeyInfinity(true);
+    public void initialize(Node<T> x, Node<T> l, Node<T> m){
+        l.setKeyInfinity(true);
+        m.setKeyInfinity(false);
         l.setP(x);
         m.setP(x);
         x.setKeyInfinity(false);
         x.setLeft(l);
         x.setMiddle(m);
-        root = x;
+        this.root = x;
     }
 
     /**
@@ -26,7 +27,7 @@ public class TwoThreeTree<T extends RunnerID> {
      * @param k key of node we're looking fot
      * @return node in the 2_3_tree rooted at x whose key is k
      */
-    public Node search(Node x, RunnerID k){
+    public Node<T> search(Node<T> x, RunnerID k){
         if (x == null || k == null)
             throw new java.lang.UnsupportedOperationException("not implemented");
 
@@ -35,9 +36,10 @@ public class TwoThreeTree<T extends RunnerID> {
                 return x;
             else return null;
         }
-        if (!x.getLeft().getKey().isSmaller(k)) {
+
+        if (x.getLeft().getIsSentinel()==0 && !k.isSmaller(x.getLeft().getKey())) {
             return search(x.getLeft(), k);
-        } else if (!x.getMiddle().getKey().isSmaller(k)) {
+        } else if (x.getMiddle().getIsSentinel()==-1 || x.getMiddle().getKey().isSmaller(k)) {
             return search(x.getMiddle(), k);
         } else return search(x.getRight(), k);
     }
@@ -46,15 +48,22 @@ public class TwoThreeTree<T extends RunnerID> {
      * update the key of x to the maximum key in its subtree
      * @param x node to update its key
      */
-    private void updateKey(Node x) {
+    private void updateKey(Node<T> x) {
         if (x == null)
             throw new java.lang.UnsupportedOperationException("not implemented");
 
         x.setKey(x.getLeft().getKey());
-        if (x.getMiddle() != null)
-            x.setKey(x.getMiddle().getKey());
-        if (x.getRight() != null)
-            x.setKey(x.getRight().getKey());
+        if(x.getMiddle()!=null) {
+            if (x.getMiddle().getIsSentinel() == Node.NEGATIVE_INFINITY)
+                x.setKeyInfinity(false);
+            else x.setKey(x.getMiddle().getKey());
+        }
+        if(x.getRight()!=null) {
+            if (x.getLeft().getIsSentinel() == Node.NEGATIVE_INFINITY)
+                x.setKeyInfinity(false);
+            else x.setKey(x.getRight().getKey());
+        }
+
     }
 
     /**
@@ -64,7 +73,7 @@ public class TwoThreeTree<T extends RunnerID> {
      * @param m middle child to be
      * @param r right child to be
      */
-    private void setChildren(Node x, Node l, Node m , Node r) {
+    private void setChildren(Node<T> x, Node<T> l, Node<T> m , Node<T> r) {
         if (x == null || l == null)
             throw new java.lang.UnsupportedOperationException("not implemented");
 
@@ -79,35 +88,37 @@ public class TwoThreeTree<T extends RunnerID> {
         updateKey(x);
     }
 
+    protected abstract Node<T> insertAndSplit(Node<T> x, Node<T> z);
+
     /**
      * insert node z as a child of node x
      * @param x parent
      * @param z new child
+     * @param y helper node to split to
      * @return split parent
      */
-    private Node insertAndSplit (Node x, Node z) {
+    protected Node<T> insertAndSplit (Node<T> x, Node<T> z, Node<T> y) {
         if (x == null || z == null)
             throw new java.lang.UnsupportedOperationException("not implemented");
 
-        Node l = x.getLeft();
-        Node m = x.getMiddle();
-        Node r = x.getRight();
+        Node<T> l = x.getLeft();
+        Node<T> m = x.getMiddle();
+        Node<T> r = x.getRight();
         if (r == null) {
-            if (z.getKey().isSmaller(l.getKey()))
+            if (l.getIsSentinel() != Node.POSITIVE_INFINITY && l.getKey().isSmaller(z.getKey()))
                 setChildren(x, z, l, m);
-            else if (z.getKey().isSmaller(m.getKey()))
+            else if (m.getIsSentinel() == Node.NEGATIVE_INFINITY || m.getKey().isSmaller(z.getKey()))
                 setChildren(x, l, z, m);
             else setChildren(x, l , m, z);
             return null;
         }
-        Node<T> y = new Node<T>(false);
-        if (z.getKey().isSmaller(l.getKey())) {
+        if (l.getIsSentinel() != Node.POSITIVE_INFINITY && l.getKey().isSmaller(z.getKey())) {
             setChildren(x, z, l, null);
             setChildren(y, m, r, null);
-        } else if (z.getKey().isSmaller(m.getKey())) {
+        } else if (m.getIsSentinel() == Node.NEGATIVE_INFINITY || m.getKey().isSmaller(z.getKey())) {
             setChildren(x, l, z, null);
             setChildren(y, m, r, null);
-        } else if (z.getKey().isSmaller(r.getKey())) {
+        } else if (r.getIsSentinel() == Node.NEGATIVE_INFINITY || r.getKey().isSmaller(z.getKey())) {
             setChildren(x, l, m, null);
             setChildren(y, z, r, null);
         } else {
@@ -117,25 +128,29 @@ public class TwoThreeTree<T extends RunnerID> {
         return y;
     }
 
+    public abstract void insert(Node<T> z);
+
     /**
      * insert the new Node z into T
      * implements 2_3_insert
      *
      * @param z new Node
      */
-    public void insert(Node z) {
+    protected void insert(Node<T> z, Node<T> w) {
         if (z == null)
             throw new java.lang.UnsupportedOperationException("not implemented");
 
-        Node y = root;
+        Node<T> y = root;
         while (!y.isLeaf()) {
-            if (z.getKey().isSmaller(y.getLeft().getKey()))
+            if (y.getLeft().getIsSentinel() != Node.POSITIVE_INFINITY &&
+                    y.getLeft().getKey().isSmaller(z.getKey()))
                 y = y.getLeft();
-            else if (z.getKey().isSmaller(y.getMiddle().getKey()))
+            else if (y.getLeft().getIsSentinel() == Node.NEGATIVE_INFINITY ||
+                    y.getMiddle().getKey().isSmaller(z.getKey()))
                 y = y.getMiddle();
             else y = y.getRight();
         }
-        Node x = y.getP();
+        Node<T> x = y.getP();
         z = insertAndSplit(x, z);
         while (x != root) {
             x = x.getP();
@@ -144,8 +159,6 @@ public class TwoThreeTree<T extends RunnerID> {
             else updateKey(x);
         }
         if (z != null) {
-            Node<T> w = new Node<T>(false);
-            Node<T> w = new Node<T>(false);
             setChildren(w, x, z, null);
             root = w;
         }
@@ -157,13 +170,13 @@ public class TwoThreeTree<T extends RunnerID> {
      * @param y node
      * @return a pointer to the parent of y (and x)
      */
-    private Node borrowOrMerge(Node y) {
+    private Node<T> borrowOrMerge(Node<T> y) {
         if (y == null)
             throw new java.lang.UnsupportedOperationException("not implemented");
 
-        Node z = y.getP();
+        Node<T> z = y.getP();
         if (y == z.getLeft()) {
-            Node x = z.getMiddle();
+            Node<T> x = z.getMiddle();
             if (x.getRight() != null) {
                 setChildren(y, y.getLeft(), x.getLeft(), null);
                 setChildren(x, x.getMiddle(), x.getRight(), null);
@@ -175,7 +188,7 @@ public class TwoThreeTree<T extends RunnerID> {
             return z;
         }
         if (y == z.getMiddle()) {
-            Node x = z.getLeft();
+            Node<T> x = z.getLeft();
             if (x.getRight() != null) {
                 setChildren(y, x.getRight(), y.getLeft(), null);
                 setChildren(x, x.getLeft(), x.getMiddle(), null);
@@ -186,7 +199,7 @@ public class TwoThreeTree<T extends RunnerID> {
             }
             return z;
         }
-        Node x = z.getMiddle();
+        Node<T> x = z.getMiddle();
         if (x.getRight() != null) {
             setChildren(y, x.getRight(), y.getLeft(), null);
             setChildren(x, x.getLeft(), x.getMiddle(), null);
@@ -203,11 +216,11 @@ public class TwoThreeTree<T extends RunnerID> {
      *
      * @param x node to delete
      */
-    public void delete(Node x) {
+    public void delete(Node<T> x) {
         if (x == null)
             throw new java.lang.UnsupportedOperationException("not implemented");
 
-        Node y = x.getP();
+        Node<T> y = x.getP();
         if (x == y.getLeft())
             setChildren(y, y.getMiddle(), y.getRight(), null);
         else if (x == y.getMiddle())
@@ -231,7 +244,7 @@ public class TwoThreeTree<T extends RunnerID> {
         }
     }
 
-    public Node getRoot() {
+    public Node<T> getRoot() {
         return root;
     }
 }
