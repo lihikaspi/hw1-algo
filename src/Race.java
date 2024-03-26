@@ -1,10 +1,18 @@
 public class Race {
+
+    private TwoThreeTreeRunner<RunnerID> IDTree;
+    private TwoThreeTreeRunner<MinRunnerID> minTree;
+    private TwoThreeTreeRunner<AvgRunnerID> avgTree;
+
+
     /**
      * initialization
      */
     public void init() // O(1)
     {
-        throw new java.lang.UnsupportedOperationException("not implemented");
+        IDTree = new TwoThreeTreeRunner<>();
+        minTree = new TwoThreeTreeRunner<>();
+        avgTree = new TwoThreeTreeRunner<>();
     }
 
     /**
@@ -13,7 +21,19 @@ public class Race {
      */
     public void addRunner(RunnerID id) // O(log(n)) //
     {
-        throw new java.lang.UnsupportedOperationException("not implemented");
+        if (id == null)
+            throw new java.lang.UnsupportedOperationException("not implemented");
+        Runner r = new Runner(id);
+        NodeRunner<RunnerID> node = new NodeRunner<>(true, r, id);
+        MinRunnerID minID = new MinRunnerID(Float.MAX_VALUE, id);
+        AvgRunnerID avgID = new AvgRunnerID(Float.MAX_VALUE, id);
+        NodeRunner<MinRunnerID> nodeMin = new NodeRunner<>(true, r, minID);
+        NodeRunner<AvgRunnerID> nodeAvg = new NodeRunner<>(true, r, avgID);
+        r.setMinLeaf(nodeMin);
+        r.setAvgLeaf(nodeAvg);
+        IDTree.insert(node);
+        minTree.insert(nodeMin);
+        avgTree.insert(nodeAvg);
     }
 
     /**
@@ -22,7 +42,13 @@ public class Race {
      */
     public void removeRunner(RunnerID id) // O(log(n))
     {
-        throw new java.lang.UnsupportedOperationException("not implemented");
+        if (id == null)
+            throw new java.lang.UnsupportedOperationException("not implemented");
+        NodeRunner<RunnerID> node = (NodeRunner<RunnerID>)IDTree.search(IDTree.getRoot(), id);
+        Runner r = node.getRunner();
+        IDTree.delete(node);
+        minTree.delete(r.getMinLeaf());
+        avgTree.delete(r.getAvgLeaf());
     }
 
     /**
@@ -32,7 +58,14 @@ public class Race {
      */
     public void addRunToRunner(RunnerID id, float time) // O(log(n) + log(m))
     {
-        throw new java.lang.UnsupportedOperationException("not implemented");
+        if(id == null || time <= 0)
+            throw new java.lang.UnsupportedOperationException("not implemented");
+        NodeRunner<RunnerID> node = (NodeRunner<RunnerID>)IDTree.search(IDTree.getRoot(), id);
+        Runner r = node.getRunner();
+        r.addRun(time);
+
+        //update the Trees
+        this.updateTrees(r);
     }
 
     /**
@@ -42,7 +75,14 @@ public class Race {
      */
     public void removeRunFromRunner(RunnerID id, float time) // O(log(n) + log(m))
     {
-        throw new java.lang.UnsupportedOperationException("not implemented");
+        if (id == null || time <= 0)
+            throw new java.lang.UnsupportedOperationException("not implemented");
+        NodeRunner<RunnerID> node = (NodeRunner<RunnerID>)IDTree.search(IDTree.getRoot(), id);
+        Runner r = node.getRunner();
+        r.deleteRun(time);
+
+        //update the Trees
+        this.updateTrees(r);
     }
 
     /**
@@ -51,8 +91,7 @@ public class Race {
      */
     public RunnerID getFastestRunnerAvg() // O(1)
     {
-
-        throw new java.lang.UnsupportedOperationException("not implemented");
+        return avgTree.getRoot().getKey();
     }
 
     /**
@@ -61,8 +100,7 @@ public class Race {
      */
     public RunnerID getFastestRunnerMin() // O(1)
     {
-
-        throw new java.lang.UnsupportedOperationException("not implemented");
+        return minTree.getRoot().getKey();
     }
 
     /**
@@ -72,8 +110,11 @@ public class Race {
      */
     public float getMinRun(RunnerID id) // O(log(n))
     {
-
-        throw new java.lang.UnsupportedOperationException("not implemented");
+        if (id == null)
+            throw new java.lang.UnsupportedOperationException("not implemented");
+        NodeRunner<RunnerID> node = (NodeRunner<RunnerID>)IDTree.search(IDTree.getRoot(), id);
+        Runner r = node.getRunner();
+        return r.getMin();
     }
 
     /**
@@ -83,7 +124,11 @@ public class Race {
      */
     public float getAvgRun(RunnerID id) // O(log(n))
     {
-        throw new java.lang.UnsupportedOperationException("not implemented");
+        if (id == null)
+            throw new java.lang.UnsupportedOperationException("not implemented");
+        NodeRunner<RunnerID> node = (NodeRunner<RunnerID>)IDTree.search(IDTree.getRoot(), id);
+        Runner r = node.getRunner();
+        return r.getAvg();
     }
 
     /**
@@ -93,7 +138,11 @@ public class Race {
      */
     public int getRankAvg(RunnerID id) // O(log(n))
     {
-        throw new java.lang.UnsupportedOperationException("not implemented");
+        if (id == null)
+            throw new java.lang.UnsupportedOperationException("not implemented");
+        NodeRunner<RunnerID> node = (NodeRunner<RunnerID>)IDTree.search(IDTree.getRoot(), id);
+        Runner r = node.getRunner();
+        return avgTree.rank(r.getAvgLeaf());
     }
 
     /**
@@ -103,6 +152,23 @@ public class Race {
      */
     public int getRankMin(RunnerID id) // O(log(n))
     {
-        throw new java.lang.UnsupportedOperationException("not implemented");
+        if (id == null)
+            throw new java.lang.UnsupportedOperationException("not implemented");
+        NodeRunner<RunnerID> node = (NodeRunner<RunnerID>)IDTree.search(IDTree.getRoot(), id);
+        Runner r = node.getRunner();
+        return minTree.rank(r.getMinLeaf());
+    }
+
+    /**
+     * update trees when a runner's runs are changed (added or deleted)
+     * @param r runner
+     */
+    private void updateTrees(Runner r){
+        //  -   delete and reinsert to the min tree
+        this.minTree.delete(r.getMinLeaf());
+        this.minTree.insert(r.getMinLeaf());
+        //  -   delete and reinsert to avg tree
+        this.avgTree.delete(r.getAvgLeaf());
+        this.avgTree.insert(r.getAvgLeaf());
     }
 }

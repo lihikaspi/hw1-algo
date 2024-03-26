@@ -10,13 +10,16 @@ public abstract class TwoThreeTree<T extends RunnerID> {
      */
     public void initialize(Node<T> x, Node<T> l, Node<T> m){
         l.setKeyInfinity(true);
+        l.setSize(0);
         m.setKeyInfinity(false);
+        l.setSize(0);
         l.setP(x);
         m.setP(x);
         x.setKeyInfinity(false);
         x.setLeft(l);
         x.setMiddle(m);
         this.root = x;
+        this.root.setSize(0);
     }
 
     /**
@@ -37,9 +40,9 @@ public abstract class TwoThreeTree<T extends RunnerID> {
             else return null;
         }
 
-        if (x.getLeft().getIsSentinel()==0 && !k.isSmaller(x.getLeft().getKey())) {
+        if (x.getLeft().getIsSentinel() == Node.NOT && !k.isSmaller(x.getLeft().getKey())) {
             return search(x.getLeft(), k);
-        } else if (x.getMiddle().getIsSentinel()==-1 || x.getMiddle().getKey().isSmaller(k)) {
+        } else if (x.getMiddle().getIsSentinel() == Node.NEGATIVE_INFINITY || x.getMiddle().getKey().isSmaller(k)) {
             return search(x.getMiddle(), k);
         } else return search(x.getRight(), k);
     }
@@ -110,6 +113,7 @@ public abstract class TwoThreeTree<T extends RunnerID> {
             else if (m.getIsSentinel() == Node.NEGATIVE_INFINITY || m.getKey().isSmaller(z.getKey()))
                 setChildren(x, l, z, m);
             else setChildren(x, l , m, z);
+            x.setSize(x.getSize() + 1);
             return null;
         }
         if (l.getIsSentinel() != Node.POSITIVE_INFINITY && l.getKey().isSmaller(z.getKey())) {
@@ -125,7 +129,16 @@ public abstract class TwoThreeTree<T extends RunnerID> {
             setChildren(x, l, m, null);
             setChildren(y, r, z, null);
         }
+        updateSize(x);
+        updateSize(y);
         return y;
+    }
+
+    private void updateSize(Node<T> x) {
+        int size = x.getLeft().getSize() + x.getMiddle().getSize();
+        if (x.getRight() != null)
+            size += x.getRight().getSize();
+        x.setSize(size);
     }
 
     public abstract void insert(Node<T> z);
@@ -140,6 +153,7 @@ public abstract class TwoThreeTree<T extends RunnerID> {
         if (z == null)
             throw new java.lang.UnsupportedOperationException("not implemented");
 
+        z.setSize(1);
         Node<T> y = root;
         while (!y.isLeaf()) {
             if (y.getLeft().getIsSentinel() != Node.POSITIVE_INFINITY &&
@@ -161,6 +175,7 @@ public abstract class TwoThreeTree<T extends RunnerID> {
         if (z != null) {
             setChildren(w, x, z, null);
             root = w;
+            updateSize(root);
         }
     }
 
@@ -185,6 +200,8 @@ public abstract class TwoThreeTree<T extends RunnerID> {
                 y.delete();
                 setChildren(z, x, z.getRight(), null);
             }
+            updateSize(y);
+            updateSize(x);
             return z;
         }
         if (y == z.getMiddle()) {
@@ -197,6 +214,8 @@ public abstract class TwoThreeTree<T extends RunnerID> {
                 y.delete();
                 setChildren(z, x, z.getRight(), null);
             }
+            updateSize(y);
+            updateSize(x);
             return z;
         }
         Node<T> x = z.getMiddle();
@@ -208,6 +227,8 @@ public abstract class TwoThreeTree<T extends RunnerID> {
             y.delete();
             setChildren(z, z.getLeft(), x, null);
         }
+        updateSize(y);
+        updateSize(x);
         return z;
     }
 
@@ -221,6 +242,7 @@ public abstract class TwoThreeTree<T extends RunnerID> {
             throw new java.lang.UnsupportedOperationException("not implemented");
 
         Node<T> y = x.getP();
+        y.setSize(y.getSize() - 1);
         if (x == y.getLeft())
             setChildren(y, y.getMiddle(), y.getRight(), null);
         else if (x == y.getMiddle())
@@ -230,6 +252,7 @@ public abstract class TwoThreeTree<T extends RunnerID> {
         while (y != null) {
             if (y.getMiddle() != null) {
                 updateKey(y);
+                updateSize(y);
                 y = y.getP();
             } else {
                 if (y != root)
@@ -242,6 +265,20 @@ public abstract class TwoThreeTree<T extends RunnerID> {
                 }
             }
         }
+    }
+
+    public int rank(Node<T> x) {
+        int rank = 1;
+        Node<T> y = x.getP();
+        while(y != null) {
+            if (x.equals(y.getMiddle()))
+                rank += y.getLeft().getSize();
+            else if (x.equals(y.getRight()))
+                rank += y.getLeft().getSize() + y.getMiddle().getSize();
+            x = y;
+            y = y.getP();
+        }
+        return rank;
     }
 
     public Node<T> getRoot() {

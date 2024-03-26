@@ -1,14 +1,14 @@
-public class Run extends RunnerID{
+public class RunID extends RunnerID{
     private final float time;
-    public Run(float time){
+    public RunID(float time){
         super();
         this.time = time;
     }
     @Override
     public boolean isSmaller(RunnerID other){
-        if (!(other instanceof Run))
+        if (!(other instanceof RunID))
             throw new java.lang.UnsupportedOperationException("not implemented");
-        return this.time < ((Run)other).getTime();
+        return this.time < ((RunID)other).getTime();
     }
     public String toString(){
         return String.valueOf(time);

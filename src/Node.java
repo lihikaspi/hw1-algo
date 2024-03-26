@@ -1,16 +1,19 @@
 public abstract class Node<T extends RunnerID> {
     static final int POSITIVE_INFINITY = 1;
     static final int NEGATIVE_INFINITY = -1;
+    static final int NOT = 0;
     private Node<T> left;
     private Node<T> middle;
     private Node<T> right;
     private Node<T> p;
     protected T key;
-    private int isSentinel = 0;
+    private int isSentinel = NOT;
     private final boolean isLeaf;
+    protected int size;
 
-    public Node(boolean leaf) {
+    public Node(boolean leaf, T key) {
         isLeaf = leaf;
+        this.key = key;
     }
 
     /**
@@ -89,4 +92,11 @@ public abstract class Node<T extends RunnerID> {
         return isSentinel;
     }
 
+    public void setSize(int size) {
+        this.size = size;
+    }
+
+    public int getSize() {
+        return size;
+    }
 }

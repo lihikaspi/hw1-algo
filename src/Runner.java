@@ -3,44 +3,44 @@ public class Runner {
     private float min;
     private float avg;
     private int countRuns;
-    private TwoThreeTree<Run> runTree;
-    private Node<Run> minLeaf;
-    private Node<Run> avgLeaf;
+    private TwoThreeTree<RunID> runTree;
+    private Node<MinRunnerID> minLeaf;
+    private Node<AvgRunnerID> avgLeaf;
 
     public Runner(RunnerID id){
         this.min = Float.MAX_VALUE;
         this.avg = Float.MAX_VALUE;
         this.countRuns = 0;
-        this.runTree = new TwoThreeTreeRun<Run>();
+        this.runTree = new TwoThreeTreeRun<>();
         this.id = id;
     }
 
     public void addRun(float time){
         //Insert Run to the tree
-        Run newRun = new Run(time);
-        Node<Run> newLeaf = new NodeRun<>(true);
+        RunID newRun = new RunID(time);
+        Node<RunID> newLeaf = new NodeRun<>(true, newRun);
         newLeaf.setKey(newRun);
         this.runTree.insert(newLeaf);
 
         //update the attributes
-        if(time<this.min)
-            this.min=time;
+        if(time<this.min) {
+            this.min = time;
+            this.minLeaf.getKey().setMinRunTime(min);
+        }
 
-        if(this.countRuns!=0)
-            this.avg = (this.avg * this.countRuns+time)/(this.countRuns+1);
-        else
+        if(this.countRuns!=0) {
+            this.avg = (this.avg * this.countRuns + time) / (this.countRuns + 1);
+            this.avgLeaf.getKey().setAvgRunTime(avg);
+        }
+        else {
             this.avg = time;
+            this.avgLeaf.getKey().setAvgRunTime(avg);
+        }
         this.countRuns++;
-
-        //update the Nodes
-        //  -   change nothing in main tree
-        //  -   delete and reinsert to the min tree
-        //  -   delete and reinsert to avg tree
-        // maybe make a function for this?
     }
 
     public void deleteRun(float time){
-        Run fakeRun = new Run(time);
+        RunID fakeRun = new RunID(time);
         this.runTree.delete(this.runTree.search(this.runTree.getRoot(), fakeRun));
 
         //update the attributes
@@ -49,7 +49,7 @@ public class Runner {
 
         if(this.countRuns>1) {
             this.avg = (this.avg * this.countRuns - time) / (this.countRuns - 1);
-            float new_min = ((Run)this.runTree.getRoot().getKey()).getTime();
+            float new_min = ((RunID)this.runTree.getRoot().getKey()).getTime();
             this.min=new_min;
         }
         else {
@@ -58,11 +58,8 @@ public class Runner {
         }
         this.countRuns--;
 
-        //update the Nodes
-        //  -   change nothing in main tree
-        //  -   delete and reinsert to the min tree
-        //  -   delete and reinsert to avg tree
-        // maybe make a function for this?
+        this.minLeaf.getKey().setMinRunTime(min);
+        this.avgLeaf.getKey().setAvgRunTime(avg);
     }
 
     public void setMinLeaf(Node minLeaf) {
@@ -71,5 +68,21 @@ public class Runner {
 
     public void setAvgLeaf(Node avgLeaf) {
         this.avgLeaf = avgLeaf;
+    }
+
+    public Node<MinRunnerID> getMinLeaf() {
+        return minLeaf;
+    }
+
+    public Node<AvgRunnerID> getAvgLeaf() {
+        return avgLeaf;
+    }
+
+    public float getMin() {
+        return min;
+    }
+
+    public float getAvg() {
+        return avg;
     }
 }
