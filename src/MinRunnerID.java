@@ -1,3 +1,7 @@
+/**
+ * nodes for the min runtime tree <br>
+ * extends RunnerID
+ */
 public class MinRunnerID extends RunnerID{
     private float minRunTime;
     private final RunnerID runner;
@@ -20,6 +24,13 @@ public class MinRunnerID extends RunnerID{
         return runner;
     }
 
+    /**
+     * check if this key is smaller than the another key <br>
+     * compares avg runtimes and if equal compares their runners
+     *
+     * @param other minRunnerID to compare
+     * @return if this key is smaller than other key
+     */
     @Override
     public boolean isSmaller(RunnerID other) {
         if (!(other instanceof MinRunnerID))

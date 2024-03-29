@@ -1,3 +1,7 @@
+/**
+ * nodes for the avg runtimes tree <br>
+ * extends RunnerID
+ */
 public class AvgRunnerID extends RunnerID{
     private float avgRunTime;
     private final RunnerID runner;
@@ -20,10 +24,18 @@ public class AvgRunnerID extends RunnerID{
         return runner;
     }
 
+    /**
+     * check if this key is smaller than the another key <br>
+     * compares avg runtimes and if equal compares their runners
+     *
+     * @param other avgRunnerID to compare
+     * @return if this key is smaller than other key
+     */
     @Override
     public boolean isSmaller(RunnerID other) {
         if (!(other instanceof AvgRunnerID))
             return false;
+
         return (this.avgRunTime < ((AvgRunnerID) other).avgRunTime) ||
                 ((this.avgRunTime == ((AvgRunnerID) other).avgRunTime) &&
                         (this.runner.isSmaller(((AvgRunnerID) other).runner)));
