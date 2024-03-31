@@ -64,7 +64,7 @@ public abstract class Node<T extends RunnerID> {
     }
 
     public void setKey(T r) {
-        // TODO: don't forget to change!!!
+        // TODO: don't forget to change!!! -- r can be null if sentinel
         if (r == null)
             throw new java.lang.UnsupportedOperationException("you are stupid");
         key = r;

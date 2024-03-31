@@ -17,16 +17,16 @@ public abstract class TwoThreeTree<T extends RunnerID> {
      */
     public void initialize(Node<T> x, Node<T> l, Node<T> m){
         /* define sentinels and root and set size to be 0 */
-        // positive sentinel
+        // positive sentinel on the most left leaf
         l.setKeyInfinity(true);
         l.setSize(0);
         l.setP(x);
-        // negative sentinel
+        // negative sentinel on the most right leaf
         m.setKeyInfinity(false);
         m.setSize(0);
         m.setP(x);
         // root
-        updateKey(x); // TODO: instead of setKeyInfinity
+        x.setKeyInfinity(false);
         x.setLeft(l);
         x.setMiddle(m);
         this.root = x;
@@ -69,15 +69,22 @@ public abstract class TwoThreeTree<T extends RunnerID> {
     private void updateKey(Node<T> x) {
         if (x == null)
             throw new java.lang.UnsupportedOperationException("not implemented");
-        // TODO: check not sentinel!!!
-        x.setKey(x.getLeft().getKey());
+
+        if (x.isLeaf())
+            throw new java.lang.UnsupportedOperationException("why leaf? :(");;
+
+        if (x.getLeft().getIsSentinel() == Node.POSITIVE_INFINITY)
+            // TODO: somehow left = negative sentinel; how the fuck did that happen?????????
+            // TODO: also sentinels ith keys that are not null????? how????
+            x.setKeyInfinity(true);
+        else x.setKey(x.getLeft().getKey());
         if(x.getMiddle() != null) {
             if (x.getMiddle().getIsSentinel() == Node.NEGATIVE_INFINITY)
                 x.setKeyInfinity(false);
             else x.setKey(x.getMiddle().getKey());
         }
         if(x.getRight() != null) {
-            if (x.getLeft().getIsSentinel() == Node.NEGATIVE_INFINITY)
+            if (x.getRight().getIsSentinel() == Node.NEGATIVE_INFINITY)
                 x.setKeyInfinity(false);
             else x.setKey(x.getRight().getKey());
         }
@@ -202,10 +209,10 @@ public abstract class TwoThreeTree<T extends RunnerID> {
         z.setSize(1);
         Node<T> y = root;
         while (!y.isLeaf()) {
-            if (y.getLeft().getIsSentinel() != Node.POSITIVE_INFINITY &&
+            if (y.getLeft().getIsSentinel() == Node.POSITIVE_INFINITY ||
                     y.getLeft().getKey().isSmaller(z.getKey()))
                 y = y.getLeft();
-            else if (y.getLeft().getIsSentinel() == Node.NEGATIVE_INFINITY ||
+            else if (y.getMiddle().getIsSentinel() != Node.NEGATIVE_INFINITY &&
                     y.getMiddle().getKey().isSmaller(z.getKey()))
                 y = y.getMiddle();
             else y = y.getRight();
