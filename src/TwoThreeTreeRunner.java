@@ -1,7 +1,11 @@
+/**
+ * 2-3-tree for all the runners
+ * extends TwoThreeTree
+ *
+ * @param <T> extends RunnerID
+ */
 public class TwoThreeTreeRunner<T extends RunnerID> extends TwoThreeTree<T>{
-    /**
-     * constructor implements 2_3_Init
-     */
+
     public TwoThreeTreeRunner(){
         NodeRunner<T> x = new NodeRunner<>(false, null, null);
         NodeRunner<T> l = new NodeRunner<>(true, null, null);

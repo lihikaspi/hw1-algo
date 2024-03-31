@@ -1,8 +1,11 @@
+/**
+ * 2-3-tree for the runs of a single runner <br>
+ * extends TwoThreeTree
+ *
+ * @param <T> extends RunnerID
+ */
 public class TwoThreeTreeRun<T extends RunnerID> extends TwoThreeTree<T>{
 
-    /**
-     * constructor implements 2_3_Init
-     */
     public TwoThreeTreeRun(){
         Node<T> x = new NodeRun<>(false, null);
         Node<T> l = new NodeRun<>(true, null);
@@ -14,6 +17,7 @@ public class TwoThreeTreeRun<T extends RunnerID> extends TwoThreeTree<T>{
     protected Node<T> insertAndSplit(Node<T> x, Node<T> z) {
         return super.insertAndSplit(x, z, new NodeRun<>(false, null));
     }
+
     @Override
     public void insert(Node<T> z){
         super.insert(z, new NodeRun<>(false, null));

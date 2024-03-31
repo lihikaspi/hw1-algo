@@ -1,21 +1,32 @@
+/**
+ * abstract two-three-tree class
+ *
+ * @param <T> extends RunnerID
+ */
 public abstract class TwoThreeTree<T extends RunnerID> {
     private Node<T> root;
 
-
     /**
-     * initializes the minimum tree with sentinels
+     * initializes the minimum tree with sentinels <br>
+     * based on pseudocode of 2_3_init from the lectures <br>
+     * takes O(1) time
+     *
      * @param x root
-     * @param l left leaf - infinite
+     * @param l left leaf - positive infinite
      * @param m right leaf - negative infinite
      */
     public void initialize(Node<T> x, Node<T> l, Node<T> m){
+        /* define sentinels and root and set size to be 0 */
+        // positive sentinel
         l.setKeyInfinity(true);
         l.setSize(0);
-        m.setKeyInfinity(false);
-        l.setSize(0);
         l.setP(x);
+        // negative sentinel
+        m.setKeyInfinity(false);
+        m.setSize(0);
         m.setP(x);
-        x.setKeyInfinity(false);
+        // root
+        updateKey(x); // TODO: instead of setKeyInfinity
         x.setLeft(l);
         x.setMiddle(m);
         this.root = x;
@@ -23,11 +34,12 @@ public abstract class TwoThreeTree<T extends RunnerID> {
     }
 
     /**
-     * search in the 2_3_tree rooted at x for a node whose key is k
-     * implements 2_3_search
+     * search in the 2_3_tree rooted at x for a node whose key is k <br>
+     * based on pseudocode of 2_3_search from the lectures <br>
+     * takes O(log(n)) time
      *
      * @param x root
-     * @param k key of node we're looking fot
+     * @param k key of node we're looking for
      * @return node in the 2_3_tree rooted at x whose key is k
      */
     public Node<T> search(Node<T> x, RunnerID k){
@@ -48,20 +60,23 @@ public abstract class TwoThreeTree<T extends RunnerID> {
     }
 
     /**
-     * update the key of x to the maximum key in its subtree
+     * update the key of x to the maximum key in its subtree <br>
+     * based on pseudocode from the lectures <br>
+     * takes O(1) time
+     *
      * @param x node to update its key
      */
     private void updateKey(Node<T> x) {
         if (x == null)
             throw new java.lang.UnsupportedOperationException("not implemented");
-
+        // TODO: check not sentinel!!!
         x.setKey(x.getLeft().getKey());
-        if(x.getMiddle()!=null) {
+        if(x.getMiddle() != null) {
             if (x.getMiddle().getIsSentinel() == Node.NEGATIVE_INFINITY)
                 x.setKeyInfinity(false);
             else x.setKey(x.getMiddle().getKey());
         }
-        if(x.getRight()!=null) {
+        if(x.getRight() != null) {
             if (x.getLeft().getIsSentinel() == Node.NEGATIVE_INFINITY)
                 x.setKeyInfinity(false);
             else x.setKey(x.getRight().getKey());
@@ -70,7 +85,10 @@ public abstract class TwoThreeTree<T extends RunnerID> {
     }
 
     /**
-     * set l, m and r to be the left, middle and right children, respectively, of x
+     * set l, m and r to be the left, middle and right children, respectively, of x <br>
+     * based on pseudocode from the lectures <br>
+     * takes O(1) time
+     *
      * @param x parent
      * @param l left child to be
      * @param m middle child to be
@@ -91,10 +109,22 @@ public abstract class TwoThreeTree<T extends RunnerID> {
         updateKey(x);
     }
 
+    /**
+     * insert node z as a child of node x <br>
+     * based on pseudocode from the lectures <br>
+     * takes O(1) time
+     *
+     * @param x parent
+     * @param z new child
+     * @return split parent
+     */
     protected abstract Node<T> insertAndSplit(Node<T> x, Node<T> z);
 
     /**
-     * insert node z as a child of node x
+     * insert node z as a child of node x <br>
+     * based on pseudocode from the lectures <br>
+     * takes O(1) time
+     *
      * @param x parent
      * @param z new child
      * @param y helper node to split to
@@ -134,20 +164,36 @@ public abstract class TwoThreeTree<T extends RunnerID> {
         return y;
     }
 
+    /**
+     * update the size attribute of given node <br>
+     * takes O(1) time
+     *
+     * @param x node to update its size
+     */
     private void updateSize(Node<T> x) {
+        // the size of each node is the sum size of its children
         int size = x.getLeft().getSize() + x.getMiddle().getSize();
         if (x.getRight() != null)
             size += x.getRight().getSize();
         x.setSize(size);
     }
 
+    /**
+     * insert the new node z into the tree <br>
+     * based on pseudocode of 2_3_insert from the lectures <br
+     * takes O(log(n))
+     *
+     * @param z new node
+     */
     public abstract void insert(Node<T> z);
 
     /**
-     * insert the new Node z into T
-     * implements 2_3_insert
+     * insert the new node z into the tree <br>
+     * based on pseudocode of 2_3_insert from the lectures <br
+     * takes O(log(n))
      *
-     * @param z new Node
+     * @param z new node
+     * @param w helper node
      */
     protected void insert(Node<T> z, Node<T> w) {
         if (z == null)
@@ -180,7 +226,9 @@ public abstract class TwoThreeTree<T extends RunnerID> {
     }
 
     /**
-     * borrow a child from a sibling x of y or merge x and y
+     * borrow a child from a sibling x of y or merge x and y <br>
+     * based on pseudocode form the lectures <br>
+     * takes O(1) time
      *
      * @param y node
      * @return a pointer to the parent of y (and x)
@@ -233,7 +281,9 @@ public abstract class TwoThreeTree<T extends RunnerID> {
     }
 
     /**
-     * delete Node x from T
+     * delete Node x from the tree <br>
+     * based on pseudocode of 2_3_delete from the lectures <br>
+     * takes O(log(n)) time
      *
      * @param x node to delete
      */
@@ -267,6 +317,14 @@ public abstract class TwoThreeTree<T extends RunnerID> {
         }
     }
 
+    /**
+     * find rank of a given node based in its key
+     * based on pseudocode from the tutorials<br>
+     * takes O(log(n)) time
+     *
+     * @param x node to find its rank
+     * @return the position of the key in the linear order of the elements in the tree
+     */
     public int rank(Node<T> x) {
         int rank = 1;
         Node<T> y = x.getP();
