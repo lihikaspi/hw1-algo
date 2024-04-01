@@ -88,6 +88,8 @@ public class Race {
         r.addRun(time);
         //update the Trees
         this.updateTrees(r);
+        minTree.setMin_avg(((MinRunnerID)minTree.minimum()).getRunner());
+        avgTree.setMin_avg(((AvgRunnerID)avgTree.minimum()).getRunner());
     }
 
     /**
@@ -119,7 +121,7 @@ public class Race {
     public RunnerID getFastestRunnerAvg() // O(1)
     {
         /* lowest runtime average = key of the root in the avg tree */
-        return avgTree.getRoot().getKey();
+        return avgTree.getMin_avg();
     }
 
     /**
@@ -131,7 +133,7 @@ public class Race {
     public RunnerID getFastestRunnerMin() // O(1)
     {
         /* lowest minimal runtime = key of the root in the min tree */
-        return minTree.getRoot().getKey();
+        return minTree.getMin_avg();
     }
 
     /**

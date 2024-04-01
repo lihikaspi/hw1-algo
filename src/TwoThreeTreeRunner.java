@@ -21,4 +21,6 @@ public class TwoThreeTreeRunner<T extends RunnerID> extends TwoThreeTree<T>{
     public void insert(Node<T> z){
         super.insert(z, new NodeRunner<>(false, null, null));
     }
+
+
 }

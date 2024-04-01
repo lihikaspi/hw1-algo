@@ -28,8 +28,8 @@ public class Main {
         race.addRunner(id1);
         race.addRunner(id2);
         race.addRunToRunner(id1, (float)118.0);
-        System.out.println("The min running time of" + id2.toString() + "is " + race.getMinRun(id2));
-        System.out.println("The avg running time of" + id1.toString() + "is " + race.getAvgRun(id1));
-        System.out.println("The runner with the smallest minimum time is "+ race.getFastestRunnerMin());
+        System.out.println("The min running time of " + id2.toString() + " is " + race.getMinRun(id2));
+        System.out.println("The avg running time of " + id1.toString() + " is " + race.getAvgRun(id1));
+        System.out.println("The runner with the smallest minimum time is " + race.getFastestRunnerMin());
         }
     }

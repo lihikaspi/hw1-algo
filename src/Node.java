@@ -68,6 +68,7 @@ public abstract class Node<T extends RunnerID> {
         if (r == null)
             throw new java.lang.UnsupportedOperationException("you are stupid");
         key = r;
+        isSentinel = NOT;
     }
 
     public T getKey() {

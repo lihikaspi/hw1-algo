@@ -4,7 +4,8 @@
  * @param <T> extends RunnerID
  */
 public abstract class TwoThreeTree<T extends RunnerID> {
-    private Node<T> root;
+    protected Node<T> root;
+    private RunnerID min_avg;
 
     /**
      * initializes the minimum tree with sentinels <br>
@@ -44,7 +45,7 @@ public abstract class TwoThreeTree<T extends RunnerID> {
      */
     public Node<T> search(Node<T> x, RunnerID k){
         if (x == null || k == null)
-            throw new java.lang.UnsupportedOperationException("not implemented");
+            throw new java.lang.IllegalArgumentException("not implemented");
 
         if (x.isLeaf()) {
             if (x.equals(k))
@@ -52,9 +53,9 @@ public abstract class TwoThreeTree<T extends RunnerID> {
             else return null;
         }
 
-        if (x.getLeft().getIsSentinel() == Node.NOT && !k.isSmaller(x.getLeft().getKey())) {
+        if (x.getLeft().getIsSentinel() != Node.POSITIVE_INFINITY && !k.isSmaller(x.getLeft().getKey())) {
             return search(x.getLeft(), k);
-        } else if (x.getMiddle().getIsSentinel() == Node.NEGATIVE_INFINITY || x.getMiddle().getKey().isSmaller(k)) {
+        } else if (x.getMiddle().getIsSentinel() == Node.NEGATIVE_INFINITY || !k.isSmaller(x.getMiddle().getKey())) {
             return search(x.getMiddle(), k);
         } else return search(x.getRight(), k);
     }
@@ -68,15 +69,15 @@ public abstract class TwoThreeTree<T extends RunnerID> {
      */
     private void updateKey(Node<T> x) {
         if (x == null)
-            throw new java.lang.UnsupportedOperationException("not implemented");
+            throw new java.lang.IllegalArgumentException("not implemented");
 
         if (x.isLeaf())
             throw new java.lang.UnsupportedOperationException("why leaf? :(");;
 
         if (x.getLeft().getIsSentinel() == Node.POSITIVE_INFINITY)
-            // TODO: somehow left = negative sentinel; how the fuck did that happen?????????
-            // TODO: also sentinels ith keys that are not null????? how????
             x.setKeyInfinity(true);
+        else if (x.getLeft().getIsSentinel() == Node.NEGATIVE_INFINITY)
+            x.setKeyInfinity(false);
         else x.setKey(x.getLeft().getKey());
         if(x.getMiddle() != null) {
             if (x.getMiddle().getIsSentinel() == Node.NEGATIVE_INFINITY)
@@ -103,7 +104,7 @@ public abstract class TwoThreeTree<T extends RunnerID> {
      */
     private void setChildren(Node<T> x, Node<T> l, Node<T> m , Node<T> r) {
         if (x == null || l == null)
-            throw new java.lang.UnsupportedOperationException("not implemented");
+            throw new java.lang.IllegalArgumentException("not implemented");
 
         x.setLeft(l);
         x.setMiddle(m);
@@ -139,7 +140,7 @@ public abstract class TwoThreeTree<T extends RunnerID> {
      */
     protected Node<T> insertAndSplit (Node<T> x, Node<T> z, Node<T> y) {
         if (x == null || z == null)
-            throw new java.lang.UnsupportedOperationException("not implemented");
+            throw new java.lang.IllegalArgumentException("not implemented");
 
         Node<T> l = x.getLeft();
         Node<T> m = x.getMiddle();
@@ -179,7 +180,9 @@ public abstract class TwoThreeTree<T extends RunnerID> {
      */
     private void updateSize(Node<T> x) {
         // the size of each node is the sum size of its children
-        int size = x.getLeft().getSize() + x.getMiddle().getSize();
+        int size = x.getLeft().getSize();
+        if (x.getMiddle() != null)
+            size += x.getMiddle().getSize();
         if (x.getRight() != null)
             size += x.getRight().getSize();
         x.setSize(size);
@@ -188,7 +191,7 @@ public abstract class TwoThreeTree<T extends RunnerID> {
     /**
      * insert the new node z into the tree <br>
      * based on pseudocode of 2_3_insert from the lectures <br
-     * takes O(log(n))
+     * takes O(log(n)) time
      *
      * @param z new node
      */
@@ -204,7 +207,7 @@ public abstract class TwoThreeTree<T extends RunnerID> {
      */
     protected void insert(Node<T> z, Node<T> w) {
         if (z == null)
-            throw new java.lang.UnsupportedOperationException("not implemented");
+            throw new java.lang.IllegalArgumentException("not implemented");
 
         z.setSize(1);
         Node<T> y = root;
@@ -242,7 +245,7 @@ public abstract class TwoThreeTree<T extends RunnerID> {
      */
     private Node<T> borrowOrMerge(Node<T> y) {
         if (y == null)
-            throw new java.lang.UnsupportedOperationException("not implemented");
+            throw new java.lang.IllegalArgumentException("not implemented");
 
         Node<T> z = y.getP();
         if (y == z.getLeft()) {
@@ -250,13 +253,16 @@ public abstract class TwoThreeTree<T extends RunnerID> {
             if (x.getRight() != null) {
                 setChildren(y, y.getLeft(), x.getLeft(), null);
                 setChildren(x, x.getMiddle(), x.getRight(), null);
+                updateSize(y);
             } else {
                 setChildren(x, y.getLeft(), x.getLeft(), x.getMiddle());
-                y.delete();
+                //y.delete();
                 setChildren(z, x, z.getRight(), null);
+                updateSize(z);
             }
-            updateSize(y);
             updateSize(x);
+
+
             return z;
         }
         if (y == z.getMiddle()) {
@@ -264,12 +270,13 @@ public abstract class TwoThreeTree<T extends RunnerID> {
             if (x.getRight() != null) {
                 setChildren(y, x.getRight(), y.getLeft(), null);
                 setChildren(x, x.getLeft(), x.getMiddle(), null);
+                updateSize(y);
             } else {
                 setChildren(x, x.getLeft(), x.getMiddle(), y.getLeft());
-                y.delete();
+                //y.delete();
                 setChildren(z, x, z.getRight(), null);
+                updateSize(z);
             }
-            updateSize(y);
             updateSize(x);
             return z;
         }
@@ -277,12 +284,13 @@ public abstract class TwoThreeTree<T extends RunnerID> {
         if (x.getRight() != null) {
             setChildren(y, x.getRight(), y.getLeft(), null);
             setChildren(x, x.getLeft(), x.getMiddle(), null);
+            updateSize(y);
         } else {
             setChildren(x, x.getLeft(), x.getMiddle(), y.getLeft());
-            y.delete();
+            //y.delete();
             setChildren(z, z.getLeft(), x, null);
+            updateSize(z);
         }
-        updateSize(y);
         updateSize(x);
         return z;
     }
@@ -296,7 +304,7 @@ public abstract class TwoThreeTree<T extends RunnerID> {
      */
     public void delete(Node<T> x) {
         if (x == null)
-            throw new java.lang.UnsupportedOperationException("not implemented");
+            throw new java.lang.IllegalArgumentException("not implemented");
 
         Node<T> y = x.getP();
         y.setSize(y.getSize() - 1);
@@ -305,7 +313,7 @@ public abstract class TwoThreeTree<T extends RunnerID> {
         else if (x == y.getMiddle())
             setChildren(y, y.getLeft(), y.getRight(), null);
         else setChildren(y, y.getLeft(), y.getMiddle(), null);
-        x.delete();
+        //x.delete();
         while (y != null) {
             if (y.getMiddle() != null) {
                 updateKey(y);
@@ -346,7 +354,37 @@ public abstract class TwoThreeTree<T extends RunnerID> {
         return rank;
     }
 
+    /**
+     * find the leaf with the smallest key in the 2-3-tree <br>
+     * based on pseudocode of 2_3_Minimum from the lectures <br>
+     * takes O(log(n)) time
+     */
+    public T minimum() {
+        Node<T> x = root;
+        while (!x.isLeaf()) {
+            if (x.getRight() != null)
+                x = x.getRight();
+            else x = x.getMiddle();
+        }
+
+        if(x.getP().getRight() != null)
+            x = x.getP().getMiddle();
+        else x = x.getP().getLeft();
+
+        if (x.getIsSentinel() != Node.POSITIVE_INFINITY)
+            return x.getKey();
+        else throw new java.lang.IllegalArgumentException("tree is empty");
+    }
+
     public Node<T> getRoot() {
         return root;
+    }
+
+    public void setMin_avg(RunnerID min_avg) {
+        this.min_avg = min_avg;
+    }
+
+    public RunnerID getMin_avg() {
+        return min_avg;
     }
 }

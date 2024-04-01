@@ -44,4 +44,5 @@ public class MinRunnerID extends RunnerID{
     public String toString() {
         return this.runner + "" + this.minRunTime;
     }
+
 }
