@@ -212,10 +212,10 @@ public abstract class TwoThreeTree<T extends RunnerID> {
         z.setSize(1);
         Node<T> y = root;
         while (!y.isLeaf()) {
-            if (y.getLeft().getIsSentinel() == Node.POSITIVE_INFINITY ||
+            if (y.getLeft().getIsSentinel() != Node.POSITIVE_INFINITY &&
                     y.getLeft().getKey().isSmaller(z.getKey()))
                 y = y.getLeft();
-            else if (y.getMiddle().getIsSentinel() != Node.NEGATIVE_INFINITY &&
+            else if (y.getLeft().getIsSentinel() != Node.POSITIVE_INFINITY &&
                     y.getMiddle().getKey().isSmaller(z.getKey()))
                 y = y.getMiddle();
             else y = y.getRight();
@@ -325,7 +325,7 @@ public abstract class TwoThreeTree<T extends RunnerID> {
                 else {
                     root = y.getLeft();
                     y.getLeft().setP(null);
-                    y.delete();
+                    //y.delete();
                     return;
                 }
             }
