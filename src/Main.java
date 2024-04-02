@@ -30,13 +30,19 @@ public class Main {
         race.addRunner(id1);
         race.addRunner(id2);
         race.addRunner(id3);
-        //race.addRunner(id4);
+        race.addRunner(id4);
         race.addRunToRunner(id1, (float)118.0);
         race.addRunToRunner(id2, (float) 90);
         race.addRunToRunner(id1, (float) 140);
+        race.addRunToRunner(id3, (float) 88);
+        race.addRunToRunner(id3, (float) 100);
+        race.addRunToRunner(id4, (float) 91);
         System.out.println("The min running time of " + id2.toString() + " is " + race.getMinRun(id2));
         System.out.println("The avg running time of " + id1.toString() + " is " + race.getAvgRun(id1));
         System.out.println("The runner with the smallest minimum time is " + race.getFastestRunnerMin());
-
+        System.out.println("The runner with the smallest average time is " + race.getFastestRunnerAvg());
+        System.out.println("remove 7");
+        race.removeRunner(id3);
+        System.out.println("The runner with the smallest minimum time is " + race.getFastestRunnerMin());
     }
 }

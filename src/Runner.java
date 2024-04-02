@@ -60,7 +60,7 @@ public class Runner {
 
         // update the attributes
         // this relies on the representation of the tree as min tree - we need to make sure that
-        // we implement the min version!!! TODO: we did :)
+        // we implement the min version!!!
         if(this.countRuns > 1) {
             this.avg = (this.avg * this.countRuns - time) / (this.countRuns - 1);
             float new_min = ((RunID)this.runTree.getRoot().getKey()).getTime(); // TODO: why redundant??

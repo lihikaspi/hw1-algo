@@ -72,7 +72,7 @@ public abstract class TwoThreeTree<T extends RunnerID> {
             throw new java.lang.IllegalArgumentException("not implemented");
 
         if (x.isLeaf())
-            throw new java.lang.UnsupportedOperationException("why leaf? :(");;
+            throw new java.lang.UnsupportedOperationException("why leaf? :(");
 
         if (x.getLeft().getIsSentinel() == Node.POSITIVE_INFINITY)
             x.setKeyInfinity(true);
@@ -215,8 +215,10 @@ public abstract class TwoThreeTree<T extends RunnerID> {
             if (y.getLeft().getIsSentinel() != Node.POSITIVE_INFINITY &&
                     y.getLeft().getKey().isSmaller(z.getKey()))
                 y = y.getLeft();
-            else if (y.getLeft().getIsSentinel() != Node.POSITIVE_INFINITY &&
-                    y.getMiddle().getKey().isSmaller(z.getKey()))
+            else if ((y.getLeft().getIsSentinel() == Node.POSITIVE_INFINITY
+                    && y.getMiddle().getIsSentinel() == Node.NOT && y.getMiddle().getKey().isSmaller(z.getKey())) ||
+                    (y.getMiddle().getIsSentinel() == Node.NOT && y.getMiddle().getKey().isSmaller(z.getKey())) ||
+                    (y.getMiddle().getIsSentinel() == Node.NEGATIVE_INFINITY))
                 y = y.getMiddle();
             else y = y.getRight();
         }

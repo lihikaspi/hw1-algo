@@ -25,20 +25,6 @@ public abstract class Node<T extends RunnerID> {
     }
 
     /**
-     * delete a node <br>
-     * takes O(1) time
-     */
-    public void delete() {
-        /* disconnect the node from all other nodes from its side
-        (in the delete function of the tree it disconnects the other node from this one) */
-        left = null;
-        middle = null;
-        right = null;
-        p = null;
-        key = null;
-    }
-
-    /**
      * check if given runner's key equals to this runner's key <br>
      *
      * @param other key of runner to compare

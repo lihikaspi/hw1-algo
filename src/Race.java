@@ -65,9 +65,11 @@ public class Race {
         NodeRunner<RunnerID> node = (NodeRunner<RunnerID>)IDTree.search(IDTree.getRoot(), id);
         Runner r = node.getRunner();
         // remove the runner
-        IDTree.delete(node);
         minTree.delete(r.getMinLeaf());
+        r.setMinLeaf(null);
         avgTree.delete(r.getAvgLeaf());
+        r.setAvgLeaf(null);
+        IDTree.delete(node);
     }
 
     /**
@@ -88,8 +90,8 @@ public class Race {
         r.addRun(time);
         //update the Trees
         this.updateTrees(r);
-        minTree.setMin_avg(((MinRunnerID)minTree.minimum()).getRunner());
-        avgTree.setMin_avg(((AvgRunnerID)avgTree.minimum()).getRunner());
+        minTree.setMin_avg(minTree.minimum().getRunner());
+        avgTree.setMin_avg(avgTree.minimum().getRunner());
     }
 
     /**
