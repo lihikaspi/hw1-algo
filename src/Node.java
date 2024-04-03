@@ -26,11 +26,14 @@ public abstract class Node<T extends RunnerID> {
 
     /**
      * check if given runner's key equals to this runner's key <br>
+     * takes O(1) time
      *
      * @param other key of runner to compare
      * @return if the two runners' keys are equal
      */
     public boolean equals(RunnerID other) {
+        if(key == null || other == null)
+            return false;
         /* this key < other key AND this key > other key */
         return !key.isSmaller(other) && !other.isSmaller(key);
     }
@@ -50,9 +53,6 @@ public abstract class Node<T extends RunnerID> {
     }
 
     public void setKey(T r) {
-        // TODO: don't forget to change!!! -- r can be null if sentinel
-        if (r == null)
-            throw new java.lang.UnsupportedOperationException("you are stupid");
         key = r;
         isSentinel = NOT;
     }

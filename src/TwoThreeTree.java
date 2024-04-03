@@ -252,13 +252,14 @@ public abstract class TwoThreeTree<T extends RunnerID> {
         Node<T> z = y.getP();
         if (y == z.getLeft()) {
             Node<T> x = z.getMiddle();
+            //borrow
             if (x.getRight() != null) {
                 setChildren(y, y.getLeft(), x.getLeft(), null);
                 setChildren(x, x.getMiddle(), x.getRight(), null);
                 updateSize(y);
             } else {
+                //merge
                 setChildren(x, y.getLeft(), x.getLeft(), x.getMiddle());
-                //y.delete();
                 setChildren(z, x, z.getRight(), null);
                 updateSize(z);
             }
@@ -275,7 +276,6 @@ public abstract class TwoThreeTree<T extends RunnerID> {
                 updateSize(y);
             } else {
                 setChildren(x, x.getLeft(), x.getMiddle(), y.getLeft());
-                //y.delete();
                 setChildren(z, x, z.getRight(), null);
                 updateSize(z);
             }
@@ -289,7 +289,6 @@ public abstract class TwoThreeTree<T extends RunnerID> {
             updateSize(y);
         } else {
             setChildren(x, x.getLeft(), x.getMiddle(), y.getLeft());
-            //y.delete();
             setChildren(z, z.getLeft(), x, null);
             updateSize(z);
         }
@@ -315,7 +314,6 @@ public abstract class TwoThreeTree<T extends RunnerID> {
         else if (x == y.getMiddle())
             setChildren(y, y.getLeft(), y.getRight(), null);
         else setChildren(y, y.getLeft(), y.getMiddle(), null);
-        //x.delete();
         while (y != null) {
             if (y.getMiddle() != null) {
                 updateKey(y);
@@ -327,7 +325,6 @@ public abstract class TwoThreeTree<T extends RunnerID> {
                 else {
                     root = y.getLeft();
                     y.getLeft().setP(null);
-                    //y.delete();
                     return;
                 }
             }

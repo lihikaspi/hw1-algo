@@ -16,10 +16,6 @@ public class AvgRunnerID extends RunnerID{
         this.avgRunTime = avgRunTime;
     }
 
-    public float getAvgRunTime() {
-        return avgRunTime;
-    }
-
     public RunnerID getRunner() {
         return runner;
     }

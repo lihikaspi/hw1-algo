@@ -37,12 +37,29 @@ public class Main {
         race.addRunToRunner(id3, (float) 88);
         race.addRunToRunner(id3, (float) 100);
         race.addRunToRunner(id4, (float) 91);
+        System.out.println(id1 + "- id1 min: " + race.getRankMin(id1));
+        System.out.println(id2 + "- id2 min: " + race.getRankMin(id2));
+        System.out.println(id3 + "- id3 min: " + race.getRankMin(id3));
+        System.out.println(id4 + "- id4 min: " + race.getRankMin(id4));
+        System.out.println();
+        System.out.println(id1 + "- id1 avg: " + race.getRankAvg(id1));
+        System.out.println(id2 + "- id2 avg: " + race.getRankAvg(id2));
+        System.out.println(id3 + "- id3 avg: " + race.getRankAvg(id3));
+        System.out.println(id4 + "- id4 avg: " + race.getRankAvg(id4));
+        System.out.println();
         System.out.println("The min running time of " + id2.toString() + " is " + race.getMinRun(id2));
         System.out.println("The avg running time of " + id1.toString() + " is " + race.getAvgRun(id1));
         System.out.println("The runner with the smallest minimum time is " + race.getFastestRunnerMin());
         System.out.println("The runner with the smallest average time is " + race.getFastestRunnerAvg());
+        System.out.println("min rank of " + id4 + ": " + race.getRankMin(id4));
         System.out.println("remove 7");
         race.removeRunner(id3);
         System.out.println("The runner with the smallest minimum time is " + race.getFastestRunnerMin());
+        System.out.println("avg rank of " + id2 + ": " + race.getRankAvg(id2));
+        race.removeRunFromRunner(id1, (float) 118);
+        System.out.println("remove run 118 from 3");
+        System.out.println("The min running time of " + id1.toString() + " is " + race.getMinRun(id1));
+        System.out.println("The avg running time of " + id1.toString() + " is " + race.getAvgRun(id1));
+
     }
 }

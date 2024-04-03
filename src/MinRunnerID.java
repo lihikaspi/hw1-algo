@@ -16,10 +16,6 @@ public class MinRunnerID extends RunnerID{
         this.minRunTime = minRunTime;
     }
 
-    public float getMinRunTime() {
-        return minRunTime;
-    }
-
     public RunnerID getRunner() {
         return runner;
     }
